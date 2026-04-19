@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Ollama LLM (requires separate setup)
+  # Run locally: ollama serve
+  
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_LLM_MODEL: llama2
+      OLLAMA_EMBEDDING_MODEL: nomic-embed-text
+      CHROMA_DB_PATH: /app/storage/chroma
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+      FRONTEND_URL: http://localhost:3000
+    volumes:
+      - ./backend/storage:/app/storage
+    depends_on:
+      - ollama
+    networks:
+      - rag-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000/api
+    depends_on:
+      - backend
+    networks:
+      - rag-network
+    restart: unless-stopped
+
+  # Optional: Ollama service (experimental - Ollama should run on host)
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+    networks:
+      - rag-network
+    restart: unless-stopped
+
+volumes:
+  ollama:
+
+networks:
+  rag-network:
+    driver: bridge
