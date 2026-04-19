@@ -17,6 +17,7 @@ from rag.agent import create_rag_agent
 from services.chat_service import ChatService
 from services.document_service import DocumentService
 from api.routes import router, set_services
+from langchain_ollama import OllamaLLM
 
 # Configure logging
 logging.basicConfig(
@@ -58,9 +59,16 @@ async def lifespan(app: FastAPI):
         # In production, you'd load existing documents from the vector store
         _retriever = create_hybrid_retriever(_vector_store, [])
 
+        # Initialize LLM
+        logger.info("Initializing LLM...")
+        llm = OllamaLLM(
+            model=settings.OLLAMA_LLM_MODEL,
+            base_url=settings.OLLAMA_BASE_URL,
+        )
+
         # Initialize RAG agent
         logger.info("Initializing RAG agent...")
-        _rag_agent = create_rag_agent(_vector_store, _retriever)
+        _rag_agent = create_rag_agent(llm, _vector_store, _retriever)
 
         # Initialize services
         logger.info("Initializing services...")
