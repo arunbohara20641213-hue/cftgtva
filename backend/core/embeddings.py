@@ -21,7 +21,6 @@ def initialize_embeddings() -> OllamaEmbeddings:
         embeddings = OllamaEmbeddings(
             model=settings.OLLAMA_EMBEDDING_MODEL,
             base_url=settings.OLLAMA_BASE_URL,
-            request_timeout=settings.OLLAMA_REQUEST_TIMEOUT,
         )
         
         # Test embeddings by embedding a test phrase
