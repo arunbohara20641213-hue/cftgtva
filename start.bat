@@ -16,6 +16,7 @@ REM Check Python
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo ERROR: Python not found. Please install Python 3.9+
+    pause
     exit /b 1
 )
 
@@ -23,6 +24,7 @@ REM Check Node.js
 node --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo ERROR: Node.js not found. Please install Node.js 16+
+    pause
     exit /b 1
 )
 
@@ -32,6 +34,7 @@ curl -s http://localhost:11434/api/tags >nul 2>&1
 if %errorlevel% neq 0 (
     echo ERROR: Ollama is not running. Start it with: ollama serve
     echo Then run this script again.
+    pause
     exit /b 1
 )
 
@@ -49,7 +52,7 @@ if not exist "venv" (
     python -m venv venv
 )
 
-call venv\Scripts\Activate.ps1
+call venv\Scripts\Activate.bat
 echo Installing/updating dependencies...
 pip install -q -r requirements.txt
 
