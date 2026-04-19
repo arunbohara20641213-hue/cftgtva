@@ -28,8 +28,13 @@ class HybridRetriever:
         self.documents = documents
 
         # Initialize BM25 retriever (keyword-based)
-        self.bm25_retriever = BM25Retriever.from_documents(documents)
-        self.bm25_retriever.k = settings.RETRIEVAL_K
+        # Handle empty documents case - will be initialized lazily when documents are added
+        if documents:
+            self.bm25_retriever = BM25Retriever.from_documents(documents)
+            self.bm25_retriever.k = settings.RETRIEVAL_K
+        else:
+            self.bm25_retriever = None
+            logger.info("Initialized hybrid retriever with no documents (BM25 will be initialized when documents are added)")
 
         logger.info(
             f"Initialized hybrid retriever with {len(documents)} documents"
@@ -78,11 +83,14 @@ class HybridRetriever:
 
         # BM25 search
         try:
-            bm25_docs_list = self.bm25_retriever.invoke(query)
-            bm25_docs = {
-                doc.metadata.get("id", i): (doc, 1.0 - (i / k))
-                for i, doc in enumerate(bm25_docs_list)
-            }
+            if self.bm25_retriever is not None:
+                bm25_docs_list = self.bm25_retriever.invoke(query)
+                bm25_docs = {
+                    doc.metadata.get("id", i): (doc, 1.0 - (i / k))
+                    for i, doc in enumerate(bm25_docs_list)
+                }
+            else:
+                bm25_docs = {}
         except Exception as e:
             logger.warning(f"BM25 search failed: {e}, using vector only")
             bm25_docs = {}
@@ -153,7 +161,11 @@ class HybridRetriever:
         vector_results = self.vector_store.similarity_search_with_score(
             query, k=k
         )
-        bm25_docs_list = self.bm25_retriever.invoke(query)
+        
+        if self.bm25_retriever is not None:
+            bm25_docs_list = self.bm25_retriever.invoke(query)
+        else:
+            bm25_docs_list = []
 
         vector_docs = {
             doc.metadata.get("id", i): (doc, 1.0 - score)
@@ -182,6 +194,28 @@ class HybridRetriever:
             combined_scores.values(), key=lambda x: x[1], reverse=True
         )
         return sorted_results[:k]
+
+    def update_documents(self, documents: List[Document]) -> None:
+        """
+        Update the retriever with new documents.
+        Called when documents are added to the vector store.
+
+        Args:
+            documents: Updated list of all documents
+        """
+        self.documents = documents
+        
+        if documents:
+            try:
+                self.bm25_retriever = BM25Retriever.from_documents(documents)
+                self.bm25_retriever.k = settings.RETRIEVAL_K
+                logger.info(f"Updated BM25 retriever with {len(documents)} documents")
+            except Exception as e:
+                logger.error(f"Failed to update BM25 retriever: {e}")
+                self.bm25_retriever = None
+        else:
+            self.bm25_retriever = None
+            logger.info("BM25 retriever cleared (no documents)")
 
 
 def create_hybrid_retriever(
