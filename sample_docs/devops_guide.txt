@@ -1,0 +1,293 @@
+DevOps and Containerization
+
+## What is DevOps?
+
+DevOps combines Development and Operations to streamline software delivery. It emphasizes automation, collaboration, and continuous improvement throughout the software lifecycle.
+
+## Core Principles
+
+1. **Automation**: Automate repetitive tasks (building, testing, deployment)
+2. **Collaboration**: Developers, testers, and operations work together
+3. **Continuous Improvement**: Measure, learn, iterate
+4. **Infrastructure as Code**: Define infrastructure in version-controlled code
+
+## The DevOps Pipeline
+
+```
+Code Commit → Build → Test → Deploy to Staging → Deploy to Production → Monitor
+     ↑                                                                        ↓
+     └────────────────── Feedback Loop (errors, metrics) ─────────────────┘
+```
+
+## Containerization with Docker
+
+### Why Docker?
+
+Traditional deployment issues:
+- "Works on my machine" syndrome
+- Dependency conflicts between projects
+- Manual environment setup takes hours
+- Inconsistency between dev and production
+
+**Docker solution**: Package application + all dependencies in an image
+
+### Core Concepts
+
+**Image**: Blueprint with application, libraries, and dependencies
+**Container**: Running instance of an image
+**Dockerfile**: Instructions to build an image
+
+### Sample Dockerfile
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y curl
+
+# Copy requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Health check
+HEALTHCHECK --interval=30s CMD curl -f http://localhost:8000/api/health
+
+# Run application
+CMD ["python", "app.py"]
+```
+
+### Build and Run
+
+```bash
+# Build image
+docker build -t myapp:1.0 .
+
+# Run container
+docker run -p 8000:8000 myapp:1.0
+
+# Run with environment variables
+docker run -p 8000:8000 -e API_KEY=secret123 myapp:1.0
+
+# Run in background
+docker run -d -p 8000:8000 myapp:1.0
+```
+
+## Docker Compose
+
+Orchestrate multiple containers (database, API, cache, etc.)
+
+### docker-compose.yml
+
+```yaml
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/mydb
+      - REDIS_URL=redis://cache:6379
+    depends_on:
+      - db
+      - cache
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  cache:
+    image: redis:7-alpine
+
+volumes:
+  pgdata:
+```
+
+### Run all services
+
+```bash
+docker-compose up -d
+docker-compose logs -f
+docker-compose down
+```
+
+## CI/CD with GitHub Actions
+
+Automatically test and deploy on code changes
+
+### .github/workflows/ci.yml
+
+```yaml
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+      
+      - name: Run tests
+        run: pytest
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build and push Docker image
+        run: |
+          docker build -t myapp:latest .
+          docker push myapp:latest
+      
+      - name: Deploy to production
+        run: |
+          # Deploy script here
+```
+
+## Infrastructure as Code
+
+Define infrastructure in code (using Terraform, CloudFormation, etc.)
+
+### Terraform Example
+
+```hcl
+# main.tf
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_instance" "web_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  
+  tags = {
+    Name = "web-server"
+  }
+}
+
+resource "aws_security_group" "web_sg" {
+  name = "web-security-group"
+  
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+```
+
+Deploy with:
+```bash
+terraform init
+terraform plan    # Preview changes
+terraform apply   # Make changes
+```
+
+## Monitoring and Logging
+
+### Key Metrics
+- **Response time**: API latency (should be <100ms for good UX)
+- **Error rate**: % of failed requests (should be <0.1%)
+- **CPU/Memory**: Resource usage
+- **Requests/sec**: Throughput capacity
+
+### ELK Stack (Elasticsearch, Logstash, Kibana)
+
+Centralized logging solution:
+- **Logstash**: Collects and processes logs
+- **Elasticsearch**: Indexes logs for fast search
+- **Kibana**: Visualizes logs and metrics
+
+### Prometheus + Grafana
+
+Metrics collection and visualization:
+- Prometheus scrapes metrics from applications
+- Grafana creates dashboards for visualization
+
+## Scaling Strategies
+
+### Horizontal Scaling
+Add more servers behind a load balancer
+- Easy to scale up/down
+- Requires stateless applications
+- Better for handling traffic spikes
+
+### Vertical Scaling
+Add more CPU/RAM to existing servers
+- Simpler to implement
+- Has physical limits
+- Causes downtime during upgrade
+
+### Auto-scaling
+Automatically add/remove servers based on load
+
+Example with Kubernetes:
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+```
+
+## Conclusion
+
+DevOps practices and containerization have become essential for modern software delivery, enabling faster releases, better reliability, and easier collaboration.

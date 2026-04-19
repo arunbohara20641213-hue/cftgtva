@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
         # Inject services into router
         set_services(_chat_service, _document_service)
 
-        logger.info("✓ RAG System started successfully")
+        logger.info("RAG System started successfully")
         logger.info(f"FastAPI running on {settings.API_HOST}:{settings.API_PORT}")
 
     except Exception as e:

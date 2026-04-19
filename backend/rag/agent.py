@@ -80,7 +80,16 @@ class RAGAgent:
             context_str = ""
             if has_context:
                 context_str = format_context(docs, max_length=8000)
-                logger.info(f"Retrieved {len(docs)} documents")
+                logger.info(
+                    f"\n[Agent] Decision: SEARCH"
+                    f"\n[Agent] Reason: Query contains specific terms or requires documents"
+                    f"\n[Agent] Context: Retrieved {len(docs)} documents"
+                )
+            else:
+                logger.info(
+                    f"\n[Agent] Decision: NO_SEARCH"
+                    f"\n[Agent] Reason: No relevant documents found or general knowledge sufficient"
+                )
 
             # Build the prompt based on whether we have context
             if has_context:

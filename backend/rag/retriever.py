@@ -108,7 +108,23 @@ class HybridRetriever:
         )
         results = [doc for doc, _ in sorted_results[:k]]
 
-        logger.info(f"Hybrid search found {len(results)} results for query")
+        # Log retrieval results for observability
+        logger.info(
+            f"\n{'='*70}"
+            f"\n[Retriever] Query: '{query}'"
+            f"\n[Retriever] Top {min(len(results), 3)} documents retrieved:"
+        )
+        
+        for i, doc in enumerate(results[:3], 1):
+            source = doc.metadata.get("source", "unknown")
+            preview = doc.page_content[:80].replace("\n", " ").strip()
+            logger.info(
+                f"\n  #{i}. Source: {source}"
+                f"\n      Preview: {preview}..."
+            )
+        
+        logger.info(f"\n{'='*70}\n")
+
         return results
 
     def retrieve_with_scores(

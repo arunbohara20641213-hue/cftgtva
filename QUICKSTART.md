@@ -1,14 +1,14 @@
 # RAG System - Quick Reference
 
-## 🎯 What This Is
+## What This Is
 
-A complete **Retrieval-Augmented Generation (RAG)** system that lets you chat with your own documents using a local LLM (Ollama).
+A complete Retrieval-Augmented Generation (RAG) system that lets you chat with your own documents using a local LLM (Ollama).
 
-**Stack:** Python + LangChain + ChromaDB + Ollama + React
+Stack: Python + LangChain + ChromaDB + Ollama + React
 
 ---
 
-## ⚡ Quick Start (Choose One)
+## Quick Start (Choose One)
 
 ### Option 1: Automatic (Easiest)
 ```bash
@@ -42,18 +42,18 @@ npm start
 
 ---
 
-## 📍 Access Points
+## Access Points
 
 | Component | URL | Purpose |
 |-----------|-----|---------|
-| **Frontend** | http://localhost:3000 | Chat with documents |
-| **API Docs** | http://localhost:8000/docs | Swagger documentation |
-| **API ReDoc** | http://localhost:8000/redoc | Alternative API docs |
-| **Health Check** | http://localhost:8000/api/health | System status |
+| Frontend | http://localhost:3000 | Chat with documents |
+| API Docs | http://localhost:8000/docs | Swagger documentation |
+| API ReDoc | http://localhost:8000/redoc | Alternative API docs |
+| Health Check | http://localhost:8000/api/health | System status |
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 | File | Purpose |
 |------|---------|
@@ -64,7 +64,7 @@ npm start
 
 ---
 
-## 🚀 How to Use
+## How to Use
 
 1. **Ensure Ollama is running**: `ollama serve` (in separate terminal)
 2. **Start the system**: Run `start.bat` or `start.sh`
@@ -75,7 +75,7 @@ npm start
 
 ---
 
-## 🧪 Verify Installation
+## Verify Installation
 
 ```bash
 # Test backend
@@ -83,15 +83,15 @@ cd backend
 python healthcheck.py
 
 # Expected output:
-# Python Imports       ✓ PASS
-# Configuration        ✓ PASS  
-# Storage              ✓ PASS
-# Ollama               ⚠ Ready (not running yet is OK)
+# Python Imports       PASS
+# Configuration        PASS  
+# Storage              PASS
+# Ollama               Ready (not running yet is OK)
 ```
 
 ---
 
-## 🎛️ Configuration
+## Configuration
 
 Edit `backend/.env` to customize (examples):
 
@@ -173,41 +173,41 @@ rag-system/
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-✅ **Multi-format documents**: PDF, TXT, Markdown, URLs  
-✅ **Intelligent retrieval**: Vector + keyword hybrid search  
-✅ **Agentic reasoning**: LLM decides when to search  
-✅ **Chat interface**: Real-time messaging  
-✅ **Source citations**: See document sources  
-✅ **Conversation memory**: Multi-turn context  
-✅ **Document management**: Upload, list, delete  
-✅ **Persistent storage**: Local SQLite database  
-✅ **Local-first**: No external APIs or internet required  
+- Multi-format documents: PDF, TXT, Markdown, URLs  
+- Intelligent retrieval: Vector + keyword hybrid search  
+- Agentic reasoning: LLM decides when to search  
+- Chat interface: Real-time messaging  
+- Source citations: See document sources  
+- Conversation memory: Multi-turn context  
+- Document management: Upload, list, delete  
+- Persistent storage: Local SQLite database  
+- Local-first: No external APIs or internet required  
 
 ---
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
 ### "Ollama connection failed"
-- Start Ollama: `ollama serve`
-- Verify: `curl http://localhost:11434/api/tags`
+Start Ollama: `ollama serve`
+Verify: `curl http://localhost:11434/api/tags`
 
 ### "Cannot connect to backend from frontend"
-- Check backend is running: `curl http://localhost:8000/api/health`
-- Verify proxy in `frontend/package.json`
+Check backend is running: `curl http://localhost:8000/api/health`
+Verify proxy in `frontend/package.json`
 
 ### "Python module not found"
-- Activate venv: `source venv/bin/activate` (Unix) or `.\venv\Scripts\Activate.ps1` (Windows)
-- Reinstall: `pip install -r requirements.txt`
+Activate venv: `source venv/bin/activate` (Unix) or `.\venv\Scripts\Activate.ps1` (Windows)
+Reinstall: `pip install -r requirements.txt`
 
 ### "ChromaDB errors"
-- Delete storage: `rm -rf backend/storage/chroma/`
-- Restart backend (collection auto-creates)
+Delete storage: `rm -rf backend/storage/chroma/`
+Restart backend (collection auto-creates)
 
 ---
 
-## 📊 Technology Summary
+## Technology Summary
 
 | Component | Technology |
 |-----------|-----------|
@@ -221,7 +221,7 @@ rag-system/
 
 ---
 
-## 🎓 Learning Resources
+## Learning Resources
 
 - Learn about RAG: [RAG Papers](https://arxiv.org/search/?query=retrieval+augmented+generation)
 - LangChain: [Documentation](https://python.langchain.com)
@@ -231,18 +231,18 @@ rag-system/
 
 ---
 
-## 🚀 Next Steps
+## Next Steps
 
-1. ✅ **Start the system** (you're here!)
-2. 📤 **Upload test documents**
-3. 💬 **Start chatting**
-4. 🎨 **Customize UI** (optional)
-5. 🔧 **Tune parameters** (optional)
-6. 🌍 **Deploy** (see IMPLEMENTATION.md for options)
+1. Start the system (you're here!)
+2. Upload test documents
+3. Start chatting
+4. Customize UI (optional)
+5. Tune parameters (optional)
+6. Deploy (see IMPLEMENTATION.md for options)
 
 ---
 
-## 📞 Support
+## Support
 
 ### Health Check
 ```bash
@@ -268,20 +268,20 @@ Look in backend terminal for detailed logs showing:
 
 ---
 
-## 🎉 You're All Set!
+## You're All Set!
 
 Everything is installed and ready to run.
 
-**Next command:**
+Next command:
 ```bash
 cd c:\Users\Arunjweh\Desktop\workspace\rag-system
 start.bat
 ```
 
-**Then visit:** http://localhost:3000
+Then visit: http://localhost:3000
 
-Happy documenting! 🚀
+Happy documenting!
 
 ---
 
-*Complete RAG system with agentic reasoning, hybrid search, and modern UI - ready to use.*
+Complete RAG system with agentic reasoning, hybrid search, and modern UI - ready to use.
