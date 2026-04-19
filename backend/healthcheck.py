@@ -54,9 +54,11 @@ def check_ollama():
         from config import settings
         import requests
         
+        headers = {"User-Agent": settings.USER_AGENT}
         response = requests.get(
             f"{settings.OLLAMA_BASE_URL}/api/tags",
-            timeout=5
+            timeout=5,
+            headers=headers
         )
         if response.status_code == 200:
             logger.info(f"✓ Ollama is reachable at {settings.OLLAMA_BASE_URL}")

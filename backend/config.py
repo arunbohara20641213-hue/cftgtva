@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     API_PORT: int = 8000
     API_RELOAD: bool = True
 
+    # HTTP Client Configuration
+    USER_AGENT: str = "RAG-System/1.0 (Document Q&A with Local LLM)"
+
     # Frontend Configuration
     FRONTEND_URL: str = "http://localhost:3000"
 
@@ -60,9 +63,11 @@ def verify_ollama_connection() -> bool:
     import requests
 
     try:
+        headers = {"User-Agent": settings.USER_AGENT}
         response = requests.get(
             f"{settings.OLLAMA_BASE_URL}/api/tags",
-            timeout=5
+            timeout=5,
+            headers=headers
         )
         if response.status_code == 200:
             print(f"✓ Ollama connected at {settings.OLLAMA_BASE_URL}")

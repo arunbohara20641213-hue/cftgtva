@@ -132,10 +132,19 @@ async def status():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
-        app,
-        host=settings.API_HOST,
-        port=settings.API_PORT,
-        reload=settings.API_RELOAD,
-        log_level="info",
-    )
+    # Use import string when reload is enabled for proper hot reloading
+    if settings.API_RELOAD:
+        uvicorn.run(
+            "app:app",
+            host=settings.API_HOST,
+            port=settings.API_PORT,
+            reload=True,
+            log_level="info",
+        )
+    else:
+        uvicorn.run(
+            app,
+            host=settings.API_HOST,
+            port=settings.API_PORT,
+            log_level="info",
+        )

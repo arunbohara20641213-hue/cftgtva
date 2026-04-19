@@ -14,6 +14,8 @@ from langchain_community.document_loaders import (
 from langchain_core.documents import Document
 import logging
 
+from config import settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -60,7 +62,11 @@ class DocumentLoader:
     def load_web_url(url: str) -> List[Document]:
         """Load content from a web URL."""
         try:
-            loader = WebBaseLoader(url)
+            # Create headers with USER_AGENT to identify requests
+            headers = {
+                "User-Agent": settings.USER_AGENT
+            }
+            loader = WebBaseLoader(url, headers=headers)
             docs = loader.load()
             logger.info(f"Loaded web URL: {url}")
             return docs
